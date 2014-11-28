@@ -2,6 +2,15 @@
 
 With this tool you will be able to perform useful operations on ableton live.
 
+## Install
+
+```
+pip install -r requirements.txt
+./bin/ableton-tool
+```
+
+pypi, coming soon...
+
 ## Decompiling MIDI Remote Scripts
 
 You can just run:
