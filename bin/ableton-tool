@@ -17,6 +17,7 @@ import shutil
 import platform
 import os
 from uncompyle2 import uncompyle_file
+from ableton import __version__
 
 class CouldNotFindAppResourcesDirectory(Exception): pass
 
@@ -69,7 +70,7 @@ def decompile_midi_remote_scripts(output_dir):
                 shutil.copyfile(compiled_file_src, compiled_file_dst)
 
 if __name__ == '__main__':
-    args = docopt(__doc__, version='Ableton Tool 0.0.1')
+    args = docopt(__doc__, version='Ableton Tool '+__version__)
     if args['decompile-midi-remote-scripts']:
         target_dir = "MIDI Remote Scripts"
         if args['<dst>']:
