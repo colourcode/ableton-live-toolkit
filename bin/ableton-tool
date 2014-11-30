@@ -3,6 +3,8 @@
 
 Usage:
   ableton-tool decompile-midi-remote-scripts [<dst>]
+  ableton-tool download-youtube-audio <url> [<dst] [<bitrate>] [<extension>]
+  ableton-tool download-youtube-video <url> [<dst]
   ableton-tool (-h | --help)
   ableton-tool --version
 
@@ -11,6 +13,7 @@ Options:
   --version     Show version.
 """
 
+import pafy
 from docopt import docopt
 import argparse
 import shutil
@@ -69,6 +72,32 @@ def decompile_midi_remote_scripts(output_dir):
             else:
                 shutil.copyfile(compiled_file_src, compiled_file_dst)
 
+def download_youtube_video(url, dst, resolution=None, extension=None):
+    video = pafy.new(url)
+    video = video.getbest()
+    if dst:
+        video.download(filepath=dst)
+    else:
+        video.download()
+
+def download_youtube_audio(url, dst=None, bitrate=None, extension=None): # bitrate="256k", extension="m4a"):
+    video = pafy.new(url)
+    audio = None
+    if not bitrate and not extension:
+        audio = video.getbestaudio()
+    else:
+        audiostreams = video.audiostreams
+        for a in audiostreams:
+            if a.bitrate == bitrate and a.extension == extension:
+                audio = a
+    if not audio:
+        print("Could not find audio at %s %s" % (bitrate, extension))
+        raise Exception
+    if dst:
+        audio.download(filepath=dst)
+    else:
+        audio.download()
+
 if __name__ == '__main__':
     args = docopt(__doc__, version='Ableton Tool '+__version__)
     if args['decompile-midi-remote-scripts']:
@@ -76,3 +105,18 @@ if __name__ == '__main__':
         if args['<dst>']:
             target_dir = args['<dst>']
         decompile_midi_remote_scripts(target_dir)
+    elif args['download-youtube-audio'] or args['download-youtube-video']:
+        dst = None
+        bitrate = None
+        extension = None
+        url = args['<url>']
+        if args['<dst>']:
+            dst = args['<dst>']
+        if args['<bitrate>']:
+            bitrate = args['<bitrate>']
+        if args['<extension>']:
+            extension = args['<extension>']
+        if args['download-youtube-audio']:
+            download_youtube_audio(url, dst, bitrate, extension)
+        elif args['download-youtube-video']:
+            download_youtube_video(url, dst)
